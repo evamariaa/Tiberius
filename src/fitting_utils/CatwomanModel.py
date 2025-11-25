@@ -103,10 +103,11 @@ class CatwomanModel(object):
         
         if 'phi' in self.pars:
             if isinstance(self.pars['phi'],float):
-                self.phi_fix = True
+                self.fix_phi = True
                 self.catwoman_params.phi = self.pars['phi'] 
             else:
-                self.phi_fix = False
+                self.fix_phi = False
+                self.catwoman_params.phi = self.pars['phi'].currVal
         else:
             self.catwoman_params.phi = 90.  #angle of rotation of top semi-circle (in degrees)
 
@@ -221,7 +222,7 @@ class CatwomanModel(object):
             if np.any(time != self.time_array): # optionally recalculating catwoman model if the time array has changed
                 self.catwoman_model = catwoman.TransitModel(self.catwoman_params, time, fac=self.catwoman_fac)
                 
-        if not self.phi_fix:
+        if not self.fix_phi:
             self.catwoman_params.phi = self.pars['phi'].currVal  
 
         model = self.catwoman_model.light_curve(self.catwoman_params)
@@ -313,7 +314,7 @@ class CatwomanModel(object):
                 #add exit here 
                 print('Choose either normal or uniform prior for err_inflation')
                 
-        if not self.phi_fix:
+        if not self.fix_phi:
             if self.prior_dict['phi_prior'] == 'N':
                 theta[index_run] = priors.GaussianPrior(self.prior_dict['phi_1'],self.prior_dict['phi_2'])(np.array(x[index_run]))
                 index_run += 1
@@ -322,7 +323,7 @@ class CatwomanModel(object):
                 index_run += 1
             else:
                 #add exit here 
-                print('Choose either normal or uniform prior for err_inflation')
+                print('Choose either normal or uniform prior for phi')
 
         return theta
 
